@@ -168,7 +168,7 @@ Evaluate model performance using:
 
 | Image                                   | Generated Caption                   |
 | --------------------------------------- | ----------------------------------- |
-| ![Dog](((https://dreamstime.com/photos-images/dog-running.html)) | "A brown dog running in the grass." |
+| ![Dog]((https://thumbs.dreamstime.com/b/closeup-brown-white-small-dog-running-grass-small-dog-running-grass-358225772.jpg)) | "A brown dog running in the grass." |
 | ![Car](https://i.imgur.com/2gTtZgk.jpg) | "A red car parked beside the road." |
 
 ---
