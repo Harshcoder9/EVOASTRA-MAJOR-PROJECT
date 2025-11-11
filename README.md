@@ -169,7 +169,7 @@ Evaluate model performance using:
 | Image                                   | Generated Caption                   |
 | --------------------------------------- | ----------------------------------- |
 | ![Dog](https://thumbs.dreamstime.com/b/closeup-brown-white-small-dog-running-grass-small-dog-running-grass-358225772.jpg) | "A brown dog running in the grass." |
-| ![Car](https://i.imgur.com/2gTtZgk.jpg) | "A red car parked beside the road." |
+| ![Car](https://thumbs.dreamstime.com/b/red-car-parked-slope-outside-old-house-windows-flowers-modern-european-street-285898877.jpg) | "A red car parked beside the road." |
 
 ---
 
