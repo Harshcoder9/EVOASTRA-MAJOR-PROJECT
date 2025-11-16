@@ -207,8 +207,13 @@ matplotlib
 ## 👨‍💻 Contributors
 
 * **Harsh Pandey** — Data Engineer & Model Developer
-* **Team EVOASTRA** — Database Architect, ML Engineer, UI Developer
-
+* **Anish Mehra** - Image Preprocessing & README
+* **Hitesh** – Worked on training the image captioning model.
+* **Om** – Worked on training the image captioning model.
+* **Aswin** – Worked on training the image captioning model.
+* **Chandrika** - Frontend through streamlit
+* **Florence** - Presentation
+* **Supriya** - Report
 ---
 
 ## 🏁 License
