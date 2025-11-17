@@ -1,49 +1,75 @@
 import streamlit as st
-from transformers import BlipProcessor, BlipForConditionalGeneration
-from transformers import MarianTokenizer, MarianMTModel
+from transformers import BlipProcessor, BlipForConditionalGeneration, MarianTokenizer, MarianMTModel
 from PIL import Image
+from gtts import gTTS
+import tempfile
 import torch
 
-st.title("📸 Image Captioning App with Translation 🌍")
+st.title("📸 Image Captioning App with Translation 🌍")  
 
 @st.cache_resource
-def load_caption_model():
+def load_model():
     processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
     model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
     return processor, model
 
+processor, model = load_model()
+
+
 @st.cache_resource
-def load_translation_models():
-    en_to_hi_tok = MarianTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-hi")
-    en_to_hi_model = MarianMTModel.from_pretrained("Helsinki-NLP/opus-mt-en-hi")
+def load_translator():
+    model_name = "Helsinki-NLP/opus-mt-en-hi"
+    tokenizer = MarianTokenizer.from_pretrained(model_name)
+    translator = MarianMTModel.from_pretrained(model_name)
+    return tokenizer, translator
 
-    hi_to_en_tok = MarianTokenizer.from_pretrained("Helsinki-NLP/opus-mt-hi-en")
-    hi_to_en_model = MarianMTModel.from_pretrained("Helsinki-NLP/opus-mt-hi-en")
+trans_tokenizer, translator = load_translator()
 
-    return en_to_hi_tok, en_to_hi_model, hi_to_en_tok, hi_to_en_model
+uploaded_file = st.file_uploader("Upload an image", type=["jpg", "png", "jpeg"])
 
 
-processor, model = load_caption_model()
-en_hi_tok, en_hi_model, hi_en_tok, hi_en_model = load_translation_models()
+lang_choice = st.radio("Choose caption language:", ["English", "Hindi"])
 
-uploaded = st.file_uploader("Upload an image", type=["jpg", "png", "jpeg"])
 
-lang = st.radio("Choose Caption Language", ["English", "Hindi"])
+def text_to_speech(text, lang_code):
+    tts = gTTS(text=text, lang=lang_code)
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
+        tts.save(fp.name)
+        return fp.name
 
-if uploaded:
-    image = Image.open(uploaded).convert("RGB")
+
+def translate_to_hindi(text):
+    tokens = trans_tokenizer([text], return_tensors="pt", padding=True)
+    output = translator.generate(**tokens)
+    hindi = trans_tokenizer.decode(output[0], skip_special_tokens=True)
+    return hindi
+
+caption = None
+
+if uploaded_file:
+    image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Uploaded Image", use_container_width=True)
 
     if st.button("Generate Caption"):
         inputs = processor(images=image, return_tensors="pt")
         output = model.generate(**inputs)
-        caption_en = processor.decode(output[0], skip_special_tokens=True)
+        caption = processor.decode(output[0], skip_special_tokens=True)
 
-
-        if lang == "Hindi":
-            translated = en_hi_model.generate(**en_hi_tok(caption_en, return_tensors="pt"))
-            hindi_caption = en_hi_tok.decode(translated[0], skip_special_tokens=True)
-            st.success("**Hindi Caption:** " + hindi_caption)
+        # English or Hindi display logic
+        if lang_choice == "English":
+            st.success("Caption: " + caption)
+            st.session_state["caption"] = caption
+            st.session_state["lang"] = "en"
 
         else:
-            st.success("**English Caption:** " + caption_en)
+            hindi_cap = translate_to_hindi(caption)
+            st.success("कैप्शन: " + hindi_cap)
+            st.session_state["caption"] = hindi_cap
+            st.session_state["lang"] = "hi"
+
+# READ ALOUD BUTTON
+if "caption" in st.session_state:
+    if st.button("🔊 Read Aloud"):
+        lang = st.session_state["lang"]
+        audio_file = text_to_speech(st.session_state["caption"], lang)
+        st.audio(audio_file, format="audio/mp3")
