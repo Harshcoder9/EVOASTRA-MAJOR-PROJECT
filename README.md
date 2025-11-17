@@ -206,8 +206,8 @@ matplotlib
 
 ## 👨‍💻 Contributors
 
-* **Harsh Pandey** — Data Engineer & Model Developer
-* **Anish Mehra** - Image Preprocessing & README
+* **Harsh Pandey** — Data Engineer, Model Developer
+* **Anish Mehra** - Image Preprocessing, README, feature additon "Read Aloud" on streamlit using gtts
 * **Hitesh** – Worked on training the image captioning model.
 * **Om** – Worked on training the image captioning model.
 * **Aswin** – Worked on training the image captioning model.
