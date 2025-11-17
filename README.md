@@ -1,20 +1,63 @@
 # 🧠 EVOASTRA - Image Captioning using Flickr8k Dataset
 
 ## 📘 Overview
-
-EVOASTRA is an AI-based **Image Captioning System** that generates human-like textual descriptions for images. It leverages the **Flickr8k dataset**, **PostgreSQL** for data storage, and a **CNN-LSTM deep learning model** to map visual features to natural language captions.
-
-The system learns to understand visual features (objects, colors, actions) and describe them in coherent sentences.
+This project, built under the **EVOASTRA Internship**, focuses on generating human-like captions for images using Deep Learning.  
+The system uses a **CNN encoder (InceptionV3)** to extract visual features and an **LSTM decoder** to generate natural language captions.  
+Additionally, the Streamlit interface provides **English → Hindi translation** and **Read-Aloud (Text-to-Speech)** support.
 
 ---
 
 ## 🎯 Objective
+To design and implement a complete deep-learning pipeline that:
 
-To create a deep learning pipeline that:
+- Extracts visual features from images using a pretrained CNN.
+- Generates text captions using an LSTM-based decoder.
+- Supports **bilingual captioning** (English and Hindi).
+- Reads captions aloud using a built-in TTS system.
+- Provides an interactive front-end using Streamlit.
 
-1. Extracts image features using pretrained **CNN encoders** (InceptionV3/ResNet50).
-2. Generates descriptive captions using an **LSTM/Transformer decoder**.
-3. Stores and processes data efficiently using **PostgreSQL**.
+---
+
+# 🔄 End-to-End Project Pipeline
+
+## **1. Data Processing**
+- Loaded and cleaned the Flickr8k captions dataset.
+- Converted raw `captions.txt` into structured CSV format.
+- Added `<start>` and `<end>` tokens.
+- Tokenized and padded captions for uniform length.
+- Prepared final datasets for training.
+
+## **2. Feature Extraction (Encoder)**
+- Used **InceptionV3** to extract 2048-dimensional feature vectors.
+- Saved features for efficient training.
+
+## **3. Caption Preparation**
+- Converted text captions into numerical sequences.
+- Applied padding for consistent input shape.
+
+## **4. Model Building (Decoder)**
+- Built an Encoder–Decoder architecture:
+  - CNN encoder → extract visual features  
+  - LSTM decoder → generate captions word-by-word  
+- Combined image embeddings with text embeddings.
+
+## **5. Model Training**
+- Trained the model with image-caption pairs.
+- Used **Adam optimizer** and tuned hyperparameters.
+- Saved trained weights for inference.
+
+## **6. Model Evaluation**
+- Measured performance using:
+  - BLEU
+  - METEOR
+  - CIDEr
+- Performed manual testing on unseen images.
+
+## **7. Translation & Read-Aloud Features**
+- Implemented **English → Hindi translation** using MarianMT.
+- Added **Text-to-Speech (gTTS)** for both English and Hindi.
+- Added a **language selection radio button** in Streamlit.
+- Enabled dual-language captioning and voice output.
 
 ---
 
@@ -23,146 +66,69 @@ To create a deep learning pipeline that:
 | Component        | Technology                 |
 | ---------------- | -------------------------- |
 | Language         | Python 3                   |
-| Database         | PostgreSQL                 |
-| Image Processing | Pillow, OpenCV             |
 | Deep Learning    | TensorFlow / Keras         |
-| Data Handling    | Pandas, NumPy              |
-| Visualization    | Matplotlib                 |
-| Environment      | Jupyter Notebook / VS Code |
+| Translation      | HuggingFace Transformers   |
+| Image Processing | Pillow, OpenCV             |
+| Deployment       | Streamlit                  |
+| Audio Output     | gTTS                       |
+| Utilities        | Pandas, NumPy, Matplotlib  |
 
 ---
 
 ## 🧩 Folder Structure
 
+
+
 ```
 EVOASTRA/
 │
-├── db_connect.py             # Connects to PostgreSQL
-├── insert_images.py          # Inserts image metadata into DB
-├── insert_captions.py        # Inserts captions into DB
-├── convert_to_csv.py         # Converts Flickr8k captions.txt → CSV
-├── captions.txt              # Original Flickr8k captions
-├── captions_10k.csv          # Cleaned CSV for model training
-├── images/                   # Folder of image files (.jpg)
-├── image_features.npy        # Extracted CNN features (optional)
-├── README.md                 # Documentation file
-└── models/                   # (Optional) Trained model weights
+├── convert_to_csv.py
+├── captions.txt
+├── captions_10k.csv
+├── images/
+├── feature_extraction.py
+├── caption_preprocessing.py
+├── caption_sequence_generation.py
+├── train_model.py
+├── models/
+├── app.py
+└── README.md
 ```
+
 
 ---
 
 ## 📦 Dataset Details
 
-**Flickr8k Dataset**
+### **Flickr8k Dataset**
+- 8,000 images  
+- 5 captions per image (40,000 total)  
+- Real, human-written captions  
+- Suitable for vision-language tasks
 
-* Images: 8,000
-* Captions per Image: 5
-* Total Captions: ~40,000
-* Source: [Kaggle - Flickr8k](https://www.kaggle.com/datasets/adityajn105/flickr8k)
-
-Each image includes five human-generated captions describing the scene.
-
----
-
-## 💾 Database Design
-
-**Database:** `flickr8k_db`
-
-### Tables
-
-#### 🖼️ `images`
-
-| Column    | Type         | Description                    |
-| --------- | ------------ | ------------------------------ |
-| image_id  | VARCHAR(255) | Image filename (Primary Key)   |
-| file_path | TEXT         | Full image path                |
-| width     | INT          | Image width                    |
-| height    | INT          | Image height                   |
-| split     | VARCHAR(10)  | Dataset split (train/val/test) |
-
-#### 💬 `captions`
-
-| Column       | Type         | Description                               |
-| ------------ | ------------ | ----------------------------------------- |
-| caption_id   | SERIAL       | Primary Key                               |
-| image_id     | VARCHAR(255) | Foreign key referencing `images.image_id` |
-| caption_text | TEXT         | Original caption text                     |
-| cleaned_text | TEXT         | Preprocessed caption text                 |
-
-#### 🧬 `captioning`
-
-| Column       | Type         | Description       |
-| ------------ | ------------ | ----------------- |
-| image_id     | VARCHAR(255) | Linked image file |
-| caption_text | TEXT         | Image caption     |
+Dataset Source: **Kaggle – Flickr8k**
 
 ---
 
 ## 🚀 Workflow
 
-### 1. **Prepare Dataset**
+### 1. Convert Raw Captions to CSV
+python convert_to_csv.py
 
-* Download Flickr8k dataset.
-* Move all `.jpg` files to:
+### 2. Extract CNN Features
+python feature_extraction.py
 
-  ```
-  D:\evoastra major project\images\
-  ```
-* Keep `captions.txt` in your project folder.
+### 3. Preprocess Captions
+python caption_preprocessing.py
 
-### 2. **Setup PostgreSQL Database**
+### 4. Generate Training Sequences
+python caption_sequence_generation.py
 
-Create database and tables:
+### 5. Train Model
+python train_model.py
 
-```sql
-CREATE DATABASE flickr8k_db;
-CREATE TABLE images (...);
-CREATE TABLE captions (...);
-```
-
-### 3. **Insert Data**
-
-```bash
-python insert_images.py
-python insert_captions.py
-```
-
-✅ Populates the database with all image metadata and captions.
-
-### 4. **Convert Captions to CSV**
-
-```bash
-python convert_to_csv_limit.py
-```
-
-✅ Creates `captions_10k.csv` containing 10,000 image-caption pairs for faster training.
-
-### 5. **Feature Extraction (Encoder)**
-
-Use a pretrained CNN such as InceptionV3:
-
-```python
-from tensorflow.keras.applications.inception_v3 import InceptionV3
-model = InceptionV3(weights='imagenet')
-```
-
-Extract 2048-dimensional feature vectors and save them as `.npy`.
-
-### 6. **Model Training (Decoder)**
-
-* Tokenize captions and add `<start>` and `<end>` tokens.
-* Pad sequences for uniform input size.
-* Train an LSTM or Transformer decoder to generate captions.
-
-### 7. **Evaluation**
-
-Evaluate model performance using:
-
-* BLEU
-* METEOR
-* CIDEr
-
----
+### 6. Run Streamlit Interface
+streamlit run app.py
 
 ## 🔍 Example Outputs
 
@@ -184,13 +150,16 @@ pip install -r req.txt
 ### Example `req.txt`
 
 ```
-psycopg2
-Pillow
-tqdm
 tensorflow
 numpy
 pandas
+Pillow
+tqdm
 matplotlib
+streamlit
+transformers
+gTTS
+sentencepiece
 ```
 
 ---
@@ -206,14 +175,14 @@ matplotlib
 
 ## 👨‍💻 Contributors
 
-* **Harsh Pandey** — Data Engineer, Model Developer
-* **Anish Mehra** - Image Preprocessing, README, feature additon "Read Aloud" on streamlit using gtts.
-* **Hitesh** – Optimized model hyperparameters during training.
-* **Om** – Handled model training pipeline and experiment runs.
-* **Aswin** – Evaluated model performance and improved accuracy.
-* **Chandrika** - Frontend through streamlit.
-* **Florence** - Presentation.
-* **Supriya** - Report.
+* **Harsh Pandey** — Data Processing, Caption Cleaning, Project Workflow, English & Hindi Translation Features
+* **Anish Mehra** - Image Preprocessing, README, feature additon "Read Aloud" on streamlit using gtts
+* **Hitesh** – Worked on training the image captioning model.
+* **Om** – Worked on training the image captioning model.
+* **Aswin** – Worked on training the image captioning model.
+* **Chandrika** - Frontend through streamlit
+* **Florence** - Presentation
+* **Supriya** - Report
 ---
 
 ## 🏁 License
