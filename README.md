@@ -177,9 +177,8 @@ sentencepiece
 
 * **Harsh Pandey** — Data Processing, Caption Cleaning, Project Workflow, English & Hindi Translation Features
 * **Anish Mehra** - Image Preprocessing, README, feature additon "Read Aloud" on streamlit using gtts
-* **Hitesh** – Worked on training the image captioning model.
+* **Hitesh** – Worked on training the image captioning model, Worked on training the image captioning model.
 * **Om** – Worked on training the image captioning model.
-* **Aswin** – Worked on training the image captioning model.
 * **Chandrika** - Frontend through streamlit
 * **Florence** - Presentation
 * **Supriya** - Report
